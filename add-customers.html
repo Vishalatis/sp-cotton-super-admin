@@ -1896,7 +1896,7 @@
                       <div class="row">
                      
                         <div
-                        class="col-lg-3 col-md-4 col-sm-4 col-xs-12 mb-4"
+                        class="col-lg-6 col-md-6 col-sm-6 col-xs-12 mb-4"
                       >
                         <div class="form-group">
                           <label style="font-size: 12px"
@@ -1909,6 +1909,35 @@
                               placeholder="Customers Name"
                               style="height: 50px;"
                             />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 mb-4">
+                        <div class="form-group">
+                          <label for="audio-upload" style="font-size: 12px;">Audio</label>
+                       <div class="mg-t-0">
+                        <button class="default-btn next-step" id="record" style="margin: 0;">RECORD</button>
+                        <button class="btn btn-info" id="stop" style="border-radius: 0;margin: 0;">STOP</button>
+                       </div>
+                          <!-- Audio Recorder -->
+                          <div style="margin-top: 10px;">
+                            <div class="collection" id="results"></div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                  
+                      
+                      
+                        <div
+                        class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mb-4"
+                      >
+                        <div class="form-group">
+                          <label style="font-size: 12px"
+                            >Note</label
+                          >
+                          <div class="nk-int-st">
+                            <textarea name="" id="" cols="30" rows="5" class="form-control" placeholder="Note"></textarea>
                           </div>
                         </div>
                       </div>
@@ -1955,6 +1984,76 @@
 
     <!-- End Footer area-->
 
+
+ <script>
+  var recorder; // globally accessible
+var blobs = [];
+var result_container = document.querySelector("#results");
+var record_button = document.querySelector("#record");
+var stop_button = document.querySelector("#stop");
+
+function captureMicrophone(callback) {
+  navigator.mediaDevices
+    .getUserMedia({ audio: true })
+    .then(callback)
+    .catch(function(error) {
+      alert("Unable to access your microphone.");
+      console.error(error);
+    });
+}
+var index = 1;
+function stopRecordingCallback() {
+  var blob = recorder.getBlob();
+  var audio_element = document.createElement("a");
+  audio_element.innerText = "FILE:" + index;
+  audio_element.className = "collection-item";
+  audio_element.href = URL.createObjectURL(blob);
+  audio_element.onclick = function() {
+    this.parentNode.removeChild(this);
+  };
+  recorder.microphone.stop();
+  result_container.appendChild(audio_element);
+  console.log("BLOBS:" + blobs.length);
+  blobs = [];
+  index++;
+  record_button.disabled = false;
+}
+
+record_button.onclick = function() {
+  this.disabled = true;
+  captureMicrophone(function(microphone) {
+    recorder = RecordRTC(microphone, {
+      type: "audio",
+      // mimeType 'audio/ogg',
+      // audioBitsPerSecond: 128000,
+      recorderType: StereoAudioRecorder,
+      numberOfAudioChannels: 1,
+      disableLogs: true,
+      desiredSampRate: 16000,
+      // sampleRate: 96000,
+      // bufferSize:2048,
+      timeSlice: 250,
+      // getNativeBlob: true,
+      ondataavailable: function(blob) {
+        console.log("BLOBS" + blob.size);
+        blobs.push(blob);
+      }
+    });
+    recorder.startRecording();
+    recorder.microphone = microphone;
+    stop_button.disabled = false;
+  });
+};
+stop_button.onclick = function() {
+  this.disabled = true;
+  recorder.stopRecording(stopRecordingCallback);
+};
+// recorder.destroy();
+// recorder.clearRecordedData();
+// recorder.pauseRecording();
+// recorder.resumeRecording();
+
+ </script>
     <!-- jquery
 		============================================ -->
     <script src="js/vendor/jquery-1.12.4.min.js"></script>
