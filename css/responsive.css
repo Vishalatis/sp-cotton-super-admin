@@ -588,8 +588,8 @@
   .modal-dialog.modals-default,
   .modal-dialog.modal-sm,
   .modal-dialog.modal-large {
-    width: 288px;
-    margin: 50px 70px;
+    width: 400px;
+    margin: 50px 14px;
   }
   .popover-wp {
     padding: 15px 15px;
